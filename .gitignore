@@ -4,3 +4,17 @@
 
 # Ignore Gradle build output directory
 build
+
+/out/
+/app/out/
+/build/
+/app/build/
+/.idea/
+/*.iml
+
+# OS / 에디터 캐시
+.DS_Store
+Thumbs.db
+
+# Gradle 캐시
+.gradle/
