@@ -21,7 +21,7 @@ public class JsonParserTest {
 
         parser.parse(dataBuffer);
 
-        assertEquals(ElementTypes.JSON_ARRAY_START, elementBuffer.type[0]);
+        assertEquals(ElementTypes.JSON_OBJECT_START, elementBuffer.type[0]);
         assertEquals(ElementTypes.JSON_PROPERTY_NAME, elementBuffer.type[1]); // key
         assertEquals(ElementTypes.JSON_PROPERTY_VALUE_STRING, elementBuffer.type[2]); // value
         assertEquals(ElementTypes.JSON_PROPERTY_NAME, elementBuffer.type[3]); // key2
