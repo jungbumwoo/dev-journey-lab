@@ -14,8 +14,17 @@ public class JsonTokenizerTest {
         dataBuffer.data = "{  \"key\" : \"value\" }".toCharArray();
         dataBuffer.length = dataBuffer.data.length;
 
-        JsonTokenizer tokenizer = new JsonTokenizer(dataBuffer, new IndexBuffer(dataBuffer.data.length, true));
+        IndexBuffer tokenBuffer = new IndexBuffer(dataBuffer.data.length, true);
+        JsonTokenizer tokenizer = new JsonTokenizer(dataBuffer, tokenBuffer);
 
+        /*
+        * dataBuffer.data
+        [
+          0:'{',   1:' ',   2:' ',   3:'"',   4:'k',   5:'e',   6:'y',   7:'"',
+          8:' ',   9:':',  10:' ',  11:'"',  12:'v',  13:'a',  14:'l',  15:'u',
+         16:'e',  17:'"',  18:' ',  19:'}'
+        ]
+        * */
         // "{"
         assertTrue(tokenizer.hasMoreTokens());
         tokenizer.parseToken();
@@ -51,6 +60,18 @@ public class JsonTokenizerTest {
         assertEquals(TokenTypes.JSON_CURLY_BRACKET_RIGHT, tokenizer.tokenType());
 
         assertFalse(tokenizer.hasMoreTokens());
+
+        assertEquals(TokenTypes.JSON_CURLY_BRACKET_LEFT, tokenBuffer.type[0]);
+        assertEquals(0, tokenBuffer.position[0]);
+        assertEquals(0, tokenBuffer.length[0]); // 왜 1이 아니라 0으로 잡을까. {는 토큰이 아니라고 보는건가. 안써서 의미 없으니까 그대로 둔듯
+
+        assertEquals(TokenTypes.JSON_STRING_TOKEN, tokenBuffer.type[1]);
+        assertEquals(4, tokenBuffer.position[1]);
+        assertEquals(3, tokenBuffer.length[1]);
+
+        assertEquals(TokenTypes.JSON_COLON, tokenBuffer.type[2]);
+        assertEquals(9, tokenBuffer.position[2]);
+        assertEquals(3, tokenBuffer.length[1]);  // 3이 의미 있는 사이즈가 아니라 의미 없으니 굳이 update를 안해준건가?
     }
 
     @Test

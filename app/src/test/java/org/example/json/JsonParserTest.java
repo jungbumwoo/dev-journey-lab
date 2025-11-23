@@ -21,6 +21,16 @@ public class JsonParserTest {
 
         parser.parse(dataBuffer);
 
+        assertEquals(TokenTypes.JSON_CURLY_BRACKET_LEFT, tokenBuffer.type[0]); // {
+        assertEquals(TokenTypes.JSON_STRING_TOKEN, tokenBuffer.type[1]);  // key
+        assertEquals(TokenTypes.JSON_COLON, tokenBuffer.type[2]);  // :
+        assertEquals(TokenTypes.JSON_STRING_TOKEN, tokenBuffer.type[3]);  // value
+        assertEquals(TokenTypes.JSON_COMMA, tokenBuffer.type[4]);  // ,
+        assertEquals(TokenTypes.JSON_STRING_TOKEN, tokenBuffer.type[5]);  // key2
+        assertEquals(TokenTypes.JSON_COLON, tokenBuffer.type[6]);  // :
+        assertEquals(TokenTypes.JSON_STRING_TOKEN, tokenBuffer.type[7]);  // value2
+        assertEquals(TokenTypes.JSON_CURLY_BRACKET_RIGHT, tokenBuffer.type[8]);  // }
+
         assertEquals(ElementTypes.JSON_OBJECT_START, elementBuffer.type[0]);
         assertEquals(ElementTypes.JSON_PROPERTY_NAME, elementBuffer.type[1]); // key
         assertEquals(ElementTypes.JSON_PROPERTY_VALUE_STRING, elementBuffer.type[2]); // value
