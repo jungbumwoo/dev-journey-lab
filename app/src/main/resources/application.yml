@@ -1,0 +1,13 @@
+spring:
+  profiles:
+    active: dev
+
+#  datasource:
+#    url: jdbc:h2:tcp://localhost/~/test
+#    username: sa
+#    password:
+
+
+#  h2:
+#    console:
+#      enable: true
