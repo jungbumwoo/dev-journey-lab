@@ -8,6 +8,6 @@ spring:
 #    password:
 
 
-#  h2:
-#    console:
-#      enable: true
+  h2:
+    console:
+      enable: true
