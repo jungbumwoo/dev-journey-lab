@@ -1,4 +1,34 @@
-.idea
 .gradle
 build/
 app/
+
+# Java class files
+*.class
+
+# Generated files
+bin/
+gen/
+out/
+target/
+
+# Log files
+*.log
+
+# IDE-specific files and directories
+.project
+.classpath
+.settings/
+.idea/
+.vscode/
+*.iml
+
+# Package manager files (e.g., Maven, Gradle)
+# Uncomment as needed
+# /target/
+# build/
+# .gradle/
+# .mvn/
+
+# Operating System files
+.DS_Store
+Thumbs.db

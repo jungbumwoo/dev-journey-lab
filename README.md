@@ -2,5 +2,6 @@
 
 브랜치 별 subject 구성
 
+- coroutine
 - feat/json_parser: json parser
 - template/java-spring-base
