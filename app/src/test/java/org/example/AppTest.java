@@ -3,6 +3,7 @@
  */
 package org.example;
 
+import com.jungbum.App;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

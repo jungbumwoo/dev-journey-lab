@@ -19,11 +19,13 @@ repositories {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter") // manage dependency
+    implementation("org.springframework.boot:spring-boot-starter-jdbc")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
 
     // Use JUnit Jupiter for testing.
     testImplementation(libs.junit.jupiter)
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
