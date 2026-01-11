@@ -8,6 +8,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import java.lang.reflect.Proxy;
 
+// transaction proxy를 생성하는 FactoryBean
 @RequiredArgsConstructor
 public class TxProxyFactoryBean implements FactoryBean<Object> {
     private final Object target;
