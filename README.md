@@ -4,7 +4,7 @@
 
 ## Branches
 
-| Branch                                                                                      | Topic            | Key Details                                             |
+| Branch                                                                                      | Topic            | Details                                                 |
 |:--------------------------------------------------------------------------------------------|:-----------------|:--------------------------------------------------------|
 | [**spring/dive**](https://github.com/jungbumwoo/dev-journey-lab/tree/spring/dive)           | **Spring Aop**   | 『토비의 스프링』 기반 AOP, Proxy, FactoryBean 원리 맛보기 및 예제 코드 최신화 |
 | [**coroutine**](https://github.com/jungbumwoo/dev-journey-lab/tree/coroutine)               | **Coroutine**    | coroutine programming 방식 확인                             |
