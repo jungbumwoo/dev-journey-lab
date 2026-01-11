@@ -1,7 +1,11 @@
-# dev-journey-lab
+# dev-journey-lab 🧪
 
-브랜치 별 subject 구성
+궁금했던 것을 코드로 작성, 실행, 접하면서 확인한 것들을 기록합니다.
 
-- coroutine
-- feat/json_parser: json parser
-- template/java-spring-base
+## 📂 브랜치 관리
+
+| Branch | Topic            | Key Details                                             |
+| :--- |:-----------------|:--------------------------------------------------------|
+| [**spring/dive**](https://github.com/your-id/dev-journey-lab/tree/spring/dive) | **Spring Aop**   | 『토비의 스프링』 기반 AOP, Proxy, FactoryBean 원리 맛보기 및 예제 코드 최신화 |
+| [**coroutine**](https://github.com/your-id/dev-journey-lab/tree/coroutine) | **Coroutine**    | coroutine programming 방식 확인                             |
+| [**feat/json_parser**](https://github.com/your-id/dev-journey-lab/tree/feat/json_parser) | **JSON Parser**  | 라이브러리 없이 직접 구현하며 json parser 맛보기                        |
