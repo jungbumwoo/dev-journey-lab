@@ -16,24 +16,8 @@ public class TransactionHandler implements InvocationHandler {
     private final PlatformTransactionManager transactionManager;
     private final String pattern; // 트랜잭션을 적용할 메소드 pattern
 
-//    private Object target;
-//    private PlatformTransactionManager transactionManager;
-//    private String pattern; // 트랜잭션을 적용할 메소드 pattern
-
-//    public void setTarget(Object target) {
-//        this.target = target;
-//    }
-//
-//    public void setTransactionManager(PlatformTransactionManager transactionManager) {
-//        this.transactionManager = transactionManager;
-//    }
-//
-//    public void setPattern(String pattern) {
-//        this.pattern = pattern;
-//    }
-
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (method.getName().startsWith(pattern)) {
+        if (pattern != null && method.getName().startsWith(pattern)) {
             return invokeInTransaction(method, args);
         } else {
             return method.invoke(target, args);
