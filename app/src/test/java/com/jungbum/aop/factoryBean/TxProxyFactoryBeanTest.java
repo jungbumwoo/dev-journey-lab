@@ -33,6 +33,7 @@ public class TxProxyFactoryBeanTest {
             return mock(PlatformTransactionManager.class);
         }
 
+        // 타겟이 바뀔 때마다 프록시 생성 코드도 추가되어야하고, 여러 타겟이 필요하면 그만큼 FactoryBean도 추가가 필요해보임
         @Bean
         public TxProxyFactoryBean txProxyFactoryBean(PlatformTransactionManager transactionManager) {
             UserService userService = new UserServiceImpl();
