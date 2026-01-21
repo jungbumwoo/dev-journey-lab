@@ -1,8 +1,8 @@
 package com.jungbum.aop.factoryBean;
 
 import com.jungbum.aop.TransactionHandler;
-import com.jungbum.aop.example.service.UserService;
-import com.jungbum.aop.example.service.UserServiceImpl;
+import com.jungbum.service.UserService;
+import com.jungbum.service.UserServiceImpl;
 import com.jungbum.factoryBean.TxProxyFactoryBean;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

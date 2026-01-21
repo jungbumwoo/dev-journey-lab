@@ -1,5 +1,8 @@
-package com.jungbum.aop.example.service;
+package com.jungbum.service;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class UserServiceImpl implements UserService {
     public void add(String name) {
         if ("error".equals(name)) throw new RuntimeException("DB error");

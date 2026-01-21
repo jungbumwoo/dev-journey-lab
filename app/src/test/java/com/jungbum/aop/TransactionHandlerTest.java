@@ -1,7 +1,7 @@
 package com.jungbum.aop;
 
-import com.jungbum.aop.example.service.UserService;
-import com.jungbum.aop.example.service.UserServiceImpl;
+import com.jungbum.service.UserService;
+import com.jungbum.service.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.transaction.PlatformTransactionManager;

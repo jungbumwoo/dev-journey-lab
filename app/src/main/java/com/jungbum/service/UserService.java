@@ -1,4 +1,4 @@
-package com.jungbum.aop.example.service;
+package com.jungbum.service;
 
 public interface UserService {
     void add(String name);

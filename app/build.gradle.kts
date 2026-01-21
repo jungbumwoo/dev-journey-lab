@@ -20,6 +20,7 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter") // manage dependency
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    runtimeOnly("com.h2database:h2")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
 
@@ -40,7 +41,32 @@ java {
     }
 }
 
-tasks.named<Test>("test") {
-    // Use JUnit Platform for unit tests.
+tasks.withType<Test> {
     useJUnitPlatform()
+
+    // 테스트 실행 중 로그 출력
+    testLogging {
+        events(
+//            "passed",
+            "skipped",
+            "failed")
+    }
+
+    // 테스트 완료 후 요약 리포트 출력
+    addTestListener(object : TestListener {
+        override fun beforeSuite(suite: TestDescriptor) {}
+        override fun beforeTest(testDescriptor: TestDescriptor) {}
+        override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {}
+
+        override fun afterSuite(suite: TestDescriptor, result: TestResult) {
+            // 모든 테스트가 끝난 시점(Root Suite)에만 출력
+            if (suite.parent == null) {
+                println("\nTest Result: ${result.resultType}")
+                println("Total Tests: ${result.testCount}")
+                println("Successes: ${result.successfulTestCount}")
+                println("Failures: ${result.failedTestCount}")
+                println("Skipped: ${result.skippedTestCount}\n")
+            }
+        }
+    })
 }
