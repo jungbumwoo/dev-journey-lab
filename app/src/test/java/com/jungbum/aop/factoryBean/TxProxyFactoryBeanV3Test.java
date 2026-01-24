@@ -1,5 +1,6 @@
 package com.jungbum.aop.factoryBean;
 
+import com.jungbum.dao.UserDao;
 import com.jungbum.factoryBean.AppConfig;
 import com.jungbum.factoryBean.NameMatchClassMethodPointcut;
 import com.jungbum.factoryBean.TransactionAdvice;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.mail.MailSender;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -53,12 +55,14 @@ public class TxProxyFactoryBeanV3Test {
             return nameMatchClassMethodPointcut;
         }
 
+        // TransactionAdvice 사용 여부는 UserServiceTest에서 검증함
         @Bean
         public DefaultPointcutAdvisor defaultPointcutAdvisor(Pointcut pointcut, TransactionAdvice transactionAdvice) {
             // TxProxyFactoryBeanTest와 달리 pointcut, advice가 분리되어있음
             return new DefaultPointcutAdvisor(pointcut, transactionAdvice);
         }
 
+        // proxyFactoryBean 주석처리. 명시적으로 팩토리 빈을 생성하지 않음
 //        @Bean
 //        ProxyFactoryBean proxyFactoryBean() {
 //            ProxyFactoryBean pfb = new ProxyFactoryBean();
@@ -66,12 +70,6 @@ public class TxProxyFactoryBeanV3Test {
 //            pfb.setInterceptorNames("defaultPointcutAdvisor");
 //            return pfb;
 //        }
-
-        // 위 proxyFactoryBean 주석처리. 명시적으로 팩토리 빈을 생성하지 않음
-        @Bean
-        public UserService userService() {
-            return new UserServiceImpl();
-        }
     }
 
     @Test

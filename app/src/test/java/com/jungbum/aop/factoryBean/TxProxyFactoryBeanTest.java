@@ -1,6 +1,7 @@
 package com.jungbum.aop.factoryBean;
 
 import com.jungbum.aop.TransactionHandler;
+import com.jungbum.dao.UserDao;
 import com.jungbum.service.UserService;
 import com.jungbum.service.UserServiceImpl;
 import com.jungbum.factoryBean.TxProxyFactoryBean;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.mail.MailSender;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -33,10 +35,20 @@ public class TxProxyFactoryBeanTest {
             return mock(PlatformTransactionManager.class);
         }
 
+        @Bean
+        public UserDao userDao() {
+            return mock(UserDao.class);
+        }
+
+        @Bean
+        public MailSender mainSender() {
+            return mock(MailSender.class);
+        }
+
         // 타겟이 바뀔 때마다 프록시 생성 코드도 추가되어야하고, 여러 타겟이 필요하면 그만큼 FactoryBean도 추가가 필요해보임
         @Bean
         public TxProxyFactoryBean txProxyFactoryBean(PlatformTransactionManager transactionManager) {
-            UserService userService = new UserServiceImpl();
+            UserService userService = new UserServiceImpl(userDao(), mainSender());
 
             TxProxyFactoryBean txProxyFactoryBean = new TxProxyFactoryBean(
                     userService, transactionManager,

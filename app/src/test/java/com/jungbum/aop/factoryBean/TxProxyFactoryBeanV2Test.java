@@ -1,5 +1,6 @@
 package com.jungbum.aop.factoryBean;
 
+import com.jungbum.dao.UserDao;
 import com.jungbum.factoryBean.AppConfig;
 import com.jungbum.factoryBean.TransactionAdvice;
 import com.jungbum.service.UserService;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.mail.MailSender;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -51,12 +53,22 @@ public class TxProxyFactoryBeanV2Test {
             return new DefaultPointcutAdvisor(pointcut, transactionAdvice);
         }
 
+        @Bean
+        public UserDao userDao() {
+            return mock(UserDao.class);
+        }
+
+        @Bean
+        public MailSender mainSender() {
+            return mock(MailSender.class);
+        }
+
         // 여기 Bean 생성 시 파라미터로 받아서 설정하려했더니 cycle이 발생하였음.
         // 파라미터로 받는게 아니라 set 시 명시적으로 넣어줘서 해결됨.
         @Bean
         ProxyFactoryBean proxyFactoryBean() {
             ProxyFactoryBean pfb = new ProxyFactoryBean();
-            pfb.setTarget(new UserServiceImpl());
+            pfb.setTarget(new UserServiceImpl(userDao(), mainSender()));
             pfb.setInterceptorNames("defaultPointcutAdvisor");
             return pfb;
         }

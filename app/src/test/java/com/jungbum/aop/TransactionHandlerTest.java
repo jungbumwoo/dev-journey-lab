@@ -1,9 +1,11 @@
 package com.jungbum.aop;
 
+import com.jungbum.dao.UserDao;
 import com.jungbum.service.UserService;
 import com.jungbum.service.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.mail.MailSender;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import java.lang.reflect.Proxy;
@@ -34,7 +36,7 @@ public class TransactionHandlerTest {
     @Test
     void transactionCommitTest() {
         // given
-        UserService target = new UserServiceImpl();
+        UserService target = new UserServiceImpl(mock(UserDao.class), mock(MailSender.class));
         TransactionHandler handler = new TransactionHandler(target, transactionManager, "add");
 
         UserService proxy = (UserService) Proxy.newProxyInstance(
@@ -54,7 +56,7 @@ public class TransactionHandlerTest {
     @Test
     void transactionRollbackTest() {
         // given
-        UserService target = new UserServiceImpl();
+        UserService target = new UserServiceImpl(mock(UserDao.class), mock(MailSender.class));
         TransactionHandler handler = new TransactionHandler(target, transactionManager, "add");
 
         UserService proxy = (UserService) Proxy.newProxyInstance(
@@ -73,7 +75,7 @@ public class TransactionHandlerTest {
     @Test
     void pattenNotMatchMethodTest() {
         // given
-        UserService target = new UserServiceImpl();
+        UserService target = new UserServiceImpl(mock(UserDao.class), mock(MailSender.class));
         TransactionHandler handler = new TransactionHandler(target, transactionManager, "add");
 
         UserService proxy = (UserService) Proxy.newProxyInstance(
