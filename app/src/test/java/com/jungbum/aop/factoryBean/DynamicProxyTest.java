@@ -6,6 +6,8 @@ import com.jungbum.aop.UpperCaseHandlerV2;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.jupiter.api.Test;
+import org.springframework.aop.ClassFilter;
+import org.springframework.aop.Pointcut;
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.NameMatchMethodPointcut;
@@ -80,5 +82,51 @@ public class DynamicProxyTest {
 
         // pointcut 조건에 해당하지 않음으로 변환 적용이 되지 않음
         assertEquals("Thank You Toby", proxiedHello.sayThankYou("Toby"));
+    }
+
+    // 이전까지 method name만 filter 하다가, class 명 filter 를 추가함
+    // 프록시 자동 생성 방식에서 사용할 포인트컷. 어떤 클래스에 적용할지 판단이 가능해
+    @Test
+    public void classNamePointcutAdvisor() {
+        // 포인트컷 준비
+        NameMatchMethodPointcut classMethodPointcut = new NameMatchMethodPointcut() {
+            @Override
+            public ClassFilter getClassFilter() {
+                return new ClassFilter() {
+                    @Override
+                    public boolean matches(Class<?> clazz) {
+                        return clazz.getSimpleName().startsWith("HelloT");
+                    }
+                };
+            }
+        };
+        classMethodPointcut.setMappedName("sayH*");
+
+        // test
+        checkAdviced(new HelloTarget(), classMethodPointcut, true);
+
+        class HelloWorld extends HelloTarget {};
+        checkAdviced(new HelloWorld(), classMethodPointcut, false);
+
+        class HelloToby extends HelloTarget {};
+        checkAdviced(new HelloToby(), classMethodPointcut, true);
+    }
+
+    private void checkAdviced(Object target, Pointcut pointcut, boolean adviced) {
+        ProxyFactoryBean pfBean = new ProxyFactoryBean();
+        pfBean.setTarget(target);
+        pfBean.addAdvisor(new DefaultPointcutAdvisor(pointcut, new UppercaseAdvice()));
+        Hello proxiedHello = (Hello) pfBean.getObject();
+
+        if (adviced) {
+            assertEquals("HELLO TOBY", proxiedHello.sayHello("Toby"));
+            assertEquals("HI TOBY", proxiedHello.sayHi("Toby"));
+            assertEquals("Thank You Toby", proxiedHello.sayThankYou("Toby"));
+        }
+        else {
+            assertEquals("Hello Toby", proxiedHello.sayHello("Toby"));
+            assertEquals("Hi Toby", proxiedHello.sayHi("Toby"));
+            assertEquals("Thank You Toby", proxiedHello.sayThankYou("Toby"));
+        }
     }
 }
