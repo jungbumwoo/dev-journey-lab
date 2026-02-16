@@ -1,6 +1,5 @@
 .gradle
 build/
-app/
 
 # Java class files
 *.class
@@ -32,3 +31,5 @@ target/
 # Operating System files
 .DS_Store
 Thumbs.db
+# Ignore Gradle build output directory
+build
