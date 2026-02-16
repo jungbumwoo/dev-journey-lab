@@ -1,4 +1,4 @@
-package io.jungbum.nio;
+package io.jungbum.nio.example;
 
 import java.io.IOException;
 

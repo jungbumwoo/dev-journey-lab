@@ -7,4 +7,4 @@
 
 rootProject.name = "nio-server"
 
-include("untitled")
+include("app")
