@@ -22,6 +22,8 @@ repositories {
 dependencies {
     // This dependency is used by the application.
     // implementation(libs.guava)
+
+    testImplementation("org.mockito:mockito-core:5.12.0")
 }
 
 testing {
