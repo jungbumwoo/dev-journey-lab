@@ -19,10 +19,21 @@ public class MessageBuffer {
 
     //package scope (default) - so they can be accessed from unit tests.
     byte[]  smallMessageBuffer  = new byte[1024 *   4 * KB];   //1024 x   4KB messages =  4MB.
-    byte[]  mediumMessageBuffer = new byte[128  * 128 * KB];   // 128 x 128KB messages = 16MB.
-    byte[]  largeMessageBuffer  = new byte[16   *   1 * MB];   //  16 *   1MB messages = 16MB.
+    byte[]  mediumMessageBuffer = new byte[128  * 128 * KB];   // 128 x 128KB messages = 16MB. / 128KB, 128개
+    byte[]  largeMessageBuffer  = new byte[16   *   1 * MB];   //  16 *   1MB messages = 16MB. / 1MB, 16개
 
-    QueueIntFlip smallMessageBufferFreeBlocks  = new QueueIntFlip(1024); // 1024 free sections
+    // cap: 1,024
+    // 0 = 0
+    // 1 = 4,096
+    // 2 = 8,192
+    // ...
+    QueueIntFlip smallMessageBufferFreeBlocks  = new QueueIntFlip(1024); // 각 4KB의 1024개 free sections
+
+    // cap: 128
+    // 0 = 0
+    // 1 = 131,072
+    // 2 = 262,144
+    // ...
     QueueIntFlip mediumMessageBufferFreeBlocks = new QueueIntFlip(128);  // 128  free sections
     QueueIntFlip largeMessageBufferFreeBlocks  = new QueueIntFlip(16);   // 16   free sections
 
@@ -32,9 +43,11 @@ public class MessageBuffer {
     public MessageBuffer() {
         //add all free sections to all free section queues.
         for(int i=0; i<smallMessageBuffer.length; i+= CAPACITY_SMALL){
+            // i = 0, 4096, 8192
             this.smallMessageBufferFreeBlocks.put(i);
         }
         for(int i=0; i<mediumMessageBuffer.length; i+= CAPACITY_MEDIUM){
+            // i = 0, 131072, 262144
             this.mediumMessageBufferFreeBlocks.put(i);
         }
         for(int i=0; i<largeMessageBuffer.length; i+= CAPACITY_LARGE){
@@ -59,7 +72,13 @@ public class MessageBuffer {
 
     public boolean expandMessage(Message message){
         if(message.capacity == CAPACITY_SMALL){
-            return moveMessage(message, this.smallMessageBufferFreeBlocks, this.mediumMessageBufferFreeBlocks, this.mediumMessageBuffer, CAPACITY_MEDIUM);
+            return moveMessage(
+                    message,
+                    this.smallMessageBufferFreeBlocks,
+                    this.mediumMessageBufferFreeBlocks,
+                    this.mediumMessageBuffer,
+                    CAPACITY_MEDIUM
+            );
         } else if(message.capacity == CAPACITY_MEDIUM){
             return moveMessage(message, this.mediumMessageBufferFreeBlocks, this.largeMessageBufferFreeBlocks, this.largeMessageBuffer, CAPACITY_LARGE);
         } else {
@@ -67,13 +86,20 @@ public class MessageBuffer {
         }
     }
 
-    private boolean moveMessage(Message message, QueueIntFlip srcBlockQueue, QueueIntFlip destBlockQueue, byte[] dest, int newCapacity) {
+    private boolean moveMessage(
+            Message message,
+            QueueIntFlip srcBlockQueue,
+            QueueIntFlip destBlockQueue,
+            byte[] dest,
+            int newCapacity
+    ) {
         int nextFreeBlock = destBlockQueue.take();
         if(nextFreeBlock == -1) return false;
 
+        // copy(src, srcPos, dest, destPos, length)
         System.arraycopy(message.sharedArray, message.offset, dest, nextFreeBlock, message.length);
 
-        srcBlockQueue.put(message.offset); //free smaller block after copy
+        srcBlockQueue.put(message.offset); //free smaller block after copy. index를 돌려줌
 
         message.sharedArray = dest;
         message.offset      = nextFreeBlock;
