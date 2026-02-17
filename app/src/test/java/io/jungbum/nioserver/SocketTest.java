@@ -47,15 +47,6 @@ public class SocketTest {
         serverSideSocket.close();
     }
 
-//    @BeforeEach
-//    public void setUp() throws IOException {
-//         Create a mock SocketChannel
-//        mockSocketChannel = Mockito.mock(SocketChannel.class);
-//        mockChannel = Mockito.mock(SocketChannel.class);
-//        socket = new Socket(mockSocketChannel);
-//        socket = new Socket(mockChannel);
-//    }
-
     @Test
     public void testRead() throws IOException {
         // Arrange
@@ -77,6 +68,7 @@ public class SocketTest {
     }
 
     @Test
+    @DisplayName("데이터를 쓸 때 쓴 바이트 수를 반환한다")
     public void testWrite() throws IOException {
         // Arrange
         ByteBuffer byteBuffer = ByteBuffer.wrap("TestData".getBytes());
@@ -95,19 +87,6 @@ public class SocketTest {
         // Assert
         assertEquals(8, totalBytesWritten);
         verify(mockSocketChannel, times(1)).write(byteBuffer);
-    }
-
-    @Test
-    @DisplayName("데이터를 쓸 때 쓴 바이트 수를 반환한다")
-    void testWriteSuccess() throws IOException {
-        ByteBuffer buffer = ByteBuffer.wrap("Hello NIO".getBytes());
-
-        when(mockSocketChannel.write(any(ByteBuffer.class))).thenReturn(9);
-
-        int written = socket.write(buffer);
-
-        assertEquals(9, written);
-        verify(mockSocketChannel, atLeastOnce()).write(buffer);
     }
 
     @Test

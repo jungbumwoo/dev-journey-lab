@@ -29,6 +29,7 @@ public class QueueIntFlip {
         this.flipped  = false;
     }
 
+    // 몇 개 take 할 수 있는지 반환. read 관점.
     public int available() {
         if(!flipped){
             return writePos - readPos;
