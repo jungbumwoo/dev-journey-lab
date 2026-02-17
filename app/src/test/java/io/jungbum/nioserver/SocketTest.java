@@ -95,7 +95,9 @@ public class SocketTest {
         Socket socket = new Socket(serverSideSocket);
         ByteBuffer writeBuf = ByteBuffer.wrap("Real Data".getBytes());
 
+        assertEquals(writeBuf.remaining(), "Real Data".length()); // 9
         clientChannel.write(writeBuf); // 클라이언트가 전송
+        assertEquals(writeBuf.remaining(), 0); // write 전에는 9, write 후에는 0
 
         ByteBuffer readBuf = ByteBuffer.allocate(128);
         int readBytes = socket.read(readBuf); // 서버 측 Socket 객체가 읽음

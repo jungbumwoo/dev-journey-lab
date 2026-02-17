@@ -38,7 +38,5 @@ public class SocketAccepter implements Runnable{
                 throw new RuntimeException(e);
             }
         }
-
-
     }
 }
