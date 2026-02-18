@@ -2,11 +2,11 @@
 
 [The Art of Computer Programming Vo1 - Donald Knuth](https://www.amazon.com/Art-Computer-Programming/s?k=The+Art+of+Computer+Programming)
 
- chap 1.4.2 coro utine 
+ chap 1.4.2 coroutine 관련 개념 예제 코드 작성 
 
 응용되는 로직:
-자바의 CompletableFuture
-Virtual Threads(Project Loom) 에서 제공하는 Continuation 개념 찾아보기
+자바 CompletableFuture
+Virtual Threads(Project Loom) 에서 제공하는 Continuation
 
 
 - coroutine
