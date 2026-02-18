@@ -68,10 +68,12 @@ class HttpMessageReaderTest {
         assertEquals(0, reader.getMessages().size());
 
         // 두 번째 부분 전송
-        when(mockSocket.read(any())).thenAnswer(inv -> {
+        // doAnswer().when() 패턴 사용: when().thenAnswer()는 내부적으로 mock 메서드를 호출하여
+        // 이전 stub의 answer가 null 인자로 실행되어 NPE가 발생함
+        doAnswer(inv -> {
             ((ByteBuffer)inv.getArgument(0)).put(part2.getBytes());
             return part2.length();
-        });
+        }).when(mockSocket).read(any());
         reader.read(mockSocket, tempBuffer);
 
         // 최종 완성 확인

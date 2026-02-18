@@ -53,13 +53,17 @@ public class HttpMessageReader implements IMessageReader {
 
             if (endIndex == -1) break;
 
+            // parseHttpRequest는 절대 인덱스를 반환하므로,
+            // writePartialMessageToMessage가 기대하는 상대 인덱스로 변환
+            int relativeEndIndex = endIndex - this.nextMessage.offset;
+
             Message completeMsg = this.nextMessage;
             Message newNextMsg = this.messageBuffer.getMessage();
             newNextMsg.metaData = new HttpHeaders();
 
-            newNextMsg.writePartialMessageToMessage(nextMessage, endIndex);
+            newNextMsg.writePartialMessageToMessage(nextMessage, relativeEndIndex);
 
-            completeMsg.length = endIndex - completeMsg.offset;
+            completeMsg.length = relativeEndIndex;
 
             completeMessages.add(completeMsg);
             this.nextMessage = newNextMsg;

@@ -88,7 +88,7 @@ public class Message {
      * message to a new Message object.
      *
      * @param message   The message containing the partial message (after the first message).
-     * @param endIndex  The end index of the first message in the buffer of the message given as parameter.
+     * @param endIndex  The end index of the message in the buffer of the message given as parameter. 각 메세지 기준의 endIndex
      *
      *
      * 어떤 용도로 쓰나?
