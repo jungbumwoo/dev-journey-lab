@@ -186,7 +186,7 @@ class SocketProcessorTest {
         testMessage.writeToMessage("test data".getBytes());
         testMessages.add(testMessage);
 
-        // 클라이언트에서 데이터 전송
+        // 클라이언트에서 데이터 전송 - Selector(readSelector.selectNow) 가 채널 감지하도록 호출하는 용도로 write 해줌
         SocketChannel clientChannel = this.clientChannels.get(0);
         clientChannel.write(ByteBuffer.wrap("Hello".getBytes()));
 
