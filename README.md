@@ -61,12 +61,8 @@ Once the server is running (it will listen on port `9999` by default), you can t
     ```bash
     curl http://localhost:9999/
     ```
-    (Expected output: `Hello World!`)
-
+    
 *   **Response with a name parameter:**
     ```bash
     curl http://localhost:9999/?name=YourName
     ```
-    (Expected output: `Hello YourName!`)
-
-To stop the server, press `Ctrl+C` in the terminal where it is running.
