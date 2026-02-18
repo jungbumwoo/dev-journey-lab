@@ -20,6 +20,10 @@ public class Socket {
 
     public int read(ByteBuffer byteBuffer) throws IOException {
         int bytesRead = this.socketChannel.read(byteBuffer);
+        if (bytesRead == -1) {
+            this.endOfStreamReached = true;
+            return -1;
+        }
         int totalBytesRead = bytesRead;
 
         // 기존 코드 수정 한 부분

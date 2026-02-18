@@ -154,7 +154,7 @@ class SocketProcessorTest {
 
     @Test
     @DisplayName("readFromSockets: 등록된 소켓에서 데이터를 읽으면 messageReader.read가 호출된다")
-    void testReadFromSocketsCallsMessageReader() throws IOException {
+    void testReadFromSocketsCallsMessageReader() throws IOException, InterruptedException {
         SocketChannel serverSide = createConnectedChannel();
         Socket socket = new Socket(serverSide);
         inboundSocketQueue.add(socket);
@@ -164,7 +164,10 @@ class SocketProcessorTest {
         SocketChannel clientChannel = this.clientChannels.get(0);
         clientChannel.write(ByteBuffer.wrap("Hello".getBytes()));
 
-        // 약간의 대기 후 읽기 시도
+        // Selector가 데이터를 감지할 시간을 주기 위해 잠시 대기
+        Thread.sleep(100);
+
+        // read
         processor.readFromSockets();
 
         assertTrue(testReaderReadCalled, "messageReader.read()가 호출되어야 한다");
@@ -172,7 +175,7 @@ class SocketProcessorTest {
 
     @Test
     @DisplayName("readFromSockets: 읽은 메시지가 있으면 messageProcessor.process가 호출된다")
-    void testReadFromSocketsProcessesMessages() throws IOException {
+    void testReadFromSocketsProcessesMessages() throws IOException, InterruptedException {
         SocketChannel serverSide = createConnectedChannel();
         Socket socket = new Socket(serverSide);
         inboundSocketQueue.add(socket);
@@ -186,6 +189,9 @@ class SocketProcessorTest {
         // 클라이언트에서 데이터 전송
         SocketChannel clientChannel = this.clientChannels.get(0);
         clientChannel.write(ByteBuffer.wrap("Hello".getBytes()));
+
+        // Selector가 데이터를 감지할 시간을 주기 위해 잠시 대기
+        Thread.sleep(100);
 
         processor.readFromSockets();
 

@@ -93,18 +93,33 @@ public class SocketTest {
     @DisplayName("실제 네트워크 연결을 통해 데이터를 읽고 쓴다")
     void testRealNetworkRead() throws IOException {
         Socket socket = new Socket(serverSideSocket);
-        ByteBuffer writeBuf = ByteBuffer.wrap("Real Data".getBytes());
+        String message = "Real Data";
+        ByteBuffer writeBuf = ByteBuffer.wrap(message.getBytes(StandardCharsets.UTF_8));
 
-        assertEquals(writeBuf.remaining(), "Real Data".length()); // 9
-        clientChannel.write(writeBuf); // 클라이언트가 전송
-        assertEquals(writeBuf.remaining(), 0); // write 전에는 9, write 후에는 0
+        assertEquals(message.length(), writeBuf.remaining()); // 9
+        clientChannel.write(writeBuf);
+        assertEquals(0, writeBuf.remaining()); // write 전에는 9, write 후에는 0
 
         ByteBuffer readBuf = ByteBuffer.allocate(128);
-        int readBytes = socket.read(readBuf); // 서버 측 Socket 객체가 읽음
+        int readBytes = 0;
+        long startTime = System.currentTimeMillis();
+        while (readBytes < message.length() && System.currentTimeMillis() - startTime < 1000) { // 1초 타임아웃
+            int justRead = socket.read(readBuf);
+            if (justRead > 0) {
+                readBytes += justRead;
+            } else if (justRead == -1) {
+                break; // EOF
+            }
+        }
 
-        assertEquals(9, readBytes);
+        assertEquals(message.length(), readBytes);
+        assertEquals(message.length(), readBuf.position(), "Read 후 position은 읽은 바이트 수와 같아야 함");
+
         readBuf.flip();
-        assertEquals("Real Data", StandardCharsets.UTF_8.decode(readBuf).toString());
+        assertEquals(message.length(), readBuf.remaining(), "Flip 후 remaining은 읽은 바이트 수와 같아야 함");
+
+        String receivedMessage = StandardCharsets.UTF_8.decode(readBuf).toString();
+        assertEquals(message, receivedMessage);
     }
 
     @Test

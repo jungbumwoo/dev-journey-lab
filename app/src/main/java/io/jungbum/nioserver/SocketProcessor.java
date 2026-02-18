@@ -6,6 +6,7 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class SocketProcessor implements Runnable{
 
@@ -16,7 +17,7 @@ public class SocketProcessor implements Runnable{
 
     private IMessageReaderFactory messageReaderFactory = null;
 
-    private Queue<Message> outboundMessageQueue = new LinkedList<>(); // todo use a better / faster queue.
+    private Queue<Message> outboundMessageQueue = new ConcurrentLinkedDeque<>();
 
     private Map<Long, Socket> socketMap = new HashMap<>();
 
