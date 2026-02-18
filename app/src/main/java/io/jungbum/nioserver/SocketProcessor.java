@@ -2,6 +2,8 @@ package io.jungbum.nioserver;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedChannelException;
+import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.*;
 
@@ -38,11 +40,176 @@ public class SocketProcessor implements Runnable{
             IMessageReaderFactory messageReaderFactory,
             IMessageProcessor messageProcessor
     ) throws IOException {
+        this.inboundSocketQueue = inboundSocketQueue;
 
+        this.readMessageBuffer = readMessageBuffer;
+        this.writeMessageBuffer = writeMessageBuffer;
+        this.writeProxy = new WriteProxy(writeMessageBuffer, this.outboundMessageQueue);
+
+        this.messageReaderFactory = messageReaderFactory;
+        this.messageProcessor = messageProcessor;
+
+        this.readSelector = Selector.open();
+        this.writeSelector = Selector.open();
     }
 
     @Override
     public void run() {
+        while (true) {
+            try {
+                executeCycle();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void executeCycle() throws IOException {
+        takeNewSockets();
+        readFromSockets();
+        writeToSockets();
+    }
+
+    public void takeNewSockets() throws IOException {
+        Socket newSocket = this.inboundSocketQueue.poll();
+
+        while(newSocket != null) {
+            newSocket.socketId = this.nextSocketId++;
+            newSocket.socketChannel.configureBlocking(false);
+
+            // message reader/writer 설정
+            newSocket.messageReader = this.messageReaderFactory.createMessageReader();
+            newSocket.messageReader.init(this.readMessageBuffer);
+            newSocket.messageWriter = new MessageWriter();
+
+            this.socketMap.put(newSocket.socketId, newSocket);
+
+            // Registers this channel with the given selector
+            SelectionKey key = newSocket.socketChannel.register(this.readSelector, SelectionKey.OP_READ);
+            // Attaches the newSocket to this key.
+            key.attach(newSocket);
+
+            newSocket = this.inboundSocketQueue.poll();
+        }
+    }
+
+    public void readFromSockets() throws IOException {
+        int readReady = this.readSelector.selectNow();
+
+        if (readReady > 0) {
+            Set<SelectionKey> selectionKeys = this.readSelector.selectedKeys();
+            Iterator<SelectionKey> keyIterator = selectionKeys.iterator();
+
+            while (keyIterator.hasNext()) {
+                SelectionKey key = keyIterator.next();
+
+                readFromSocket(key);
+
+                keyIterator.remove();
+            }
+
+            selectionKeys.clear();
+        }
+    }
+
+    private void readFromSocket(SelectionKey key) throws IOException {
+        Socket socket = (Socket) key.attachment();
+        socket.messageReader.read(socket, this.readByteBuffer);
+
+        List<Message> fullMessages = socket.messageReader.getMessages();
+        if (!fullMessages.isEmpty()) {
+            for (Message message : fullMessages) {
+                message.socketId = socket.socketId;
+                this.messageProcessor.process(message, this.writeProxy);
+            }
+            fullMessages.clear();
+        }
+
+        if (socket.endOfStreamReached) {
+            System.out.println("Socket closed: " + socket.socketId);
+            this.socketMap.remove(socket.socketId);
+            key.attach(null);
+            key.cancel();
+            key.channel().close();
+        }
+    }
+
+    public void writeToSockets() throws IOException {
+
+        // Take all new messages from outboundMessageQueue
+        takeNewOutboundMessages();
+
+        // Cancel all sockets which have no more data to write.
+        cancelEmptySockets();
+
+        // Register all sockets that *have* data and which are not yet registered.
+        registerNonEmptySockets();
+
+        // Select from Selector.
+        int writeReady = this.writeSelector.selectNow();
+
+        if (writeReady > 0) {
+            Set<SelectionKey> selectionKeys = this.writeSelector.selectedKeys();
+            Iterator<SelectionKey> keyIterator = selectionKeys.iterator();
+
+            while (keyIterator.hasNext()) {
+                SelectionKey key = keyIterator.next();
+
+                Socket socket = (Socket) key.attachment();
+
+                socket.messageWriter.write(socket, this.writeByteBuffer);
+
+                if (socket.messageWriter.isEmpty()) {
+                    this.nonEmptyToEmptySockets.add(socket);
+                }
+
+                keyIterator.remove();
+            }
+
+            selectionKeys.clear();
+        }
+    }
+
+    private void registerNonEmptySockets() throws ClosedChannelException {
+        for (Socket socket: emptyToNonEmptySockets) {
+            socket.socketChannel.register(this.writeSelector, SelectionKey.OP_WRITE, socket);
+        }
+        emptyToNonEmptySockets.clear();
+    }
+
+    private void cancelEmptySockets() {
+        for(Socket socket : nonEmptyToEmptySockets){
+            SelectionKey key = socket.socketChannel.keyFor(this.writeSelector);
+
+            key.cancel();
+        }
+        nonEmptyToEmptySockets.clear();
+    }
+
+    // 외부에서 발생한 메시지들을 각 소켓의 개별 라이터(MessageWriter)에게 전달
+    private void takeNewOutboundMessages() {
+        Message outMessage = this.outboundMessageQueue.poll(); // 여기 write 한 코드는 어디에?
+        while (outMessage != null) {
+            Socket socket = this.socketMap.get(outMessage.socketId);
+
+            if (socket != null) {
+                MessageWriter messageWriter = socket.messageWriter;
+                if (messageWriter.isEmpty()) {
+                    messageWriter.enqueue(outMessage);
+                    nonEmptyToEmptySockets.remove(socket);
+                    emptyToNonEmptySockets.add(socket);  //not necessary if removed from nonEmptyToEmptySockets in prev. statement.
+                } else {
+                    messageWriter.enqueue(outMessage);
+                }
+            }
+
+            outMessage = this.outboundMessageQueue.poll();
+        }
     }
 }
