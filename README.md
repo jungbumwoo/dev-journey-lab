@@ -1,6 +1,6 @@
 # nio-server 🧪
 
-프로젝트 설명: [NIO non-blocking server (NIO_SERVER_REVIEW.md)](.NIO_SERVER_REVIEW.md)
+프로젝트 설명: [NIO non-blocking server (NIO_SERVER_REVIEW.md)](https://github.com/jungbumwoo/dev-journey-lab/blob/main/.NIO_SERVER_REVIEW.md)
 
 https://github.com/jjenkov/java-nio-server/tree/master 에 일부 개선 및 테스트를 추가하였음.
 
