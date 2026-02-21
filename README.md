@@ -174,3 +174,30 @@ void fill(List<? super Integer> list)    // List<Integer>, List<Number>, List<Ob
 | `invokestatic` | static 메서드 호출 |
 | `checkcast` | 런타임 타입 캐스트 검사 (type erasure로 컴파일러 삽입) |
 | `instanceof` | 타입 검사 |
+
+---
+
+# 컴파일
+./gradlew compileJava
+
+# 개별 데모 실행
+./gradlew runAbstract                                                                                                                                                                                                                                                                                                  
+./gradlew runErasure
+./gradlew runBridge
+./gradlew runBounded
+
+# 전체 실행 (순서대로)
+./gradlew runAll
+
+# 바이트코드 검사
+./gradlew inspect -PclassName=Shape
+./gradlew inspect -PclassName=Shape           -Pflags="-verbose"
+./gradlew inspect -PclassName=Box             -Pflags="-verbose"
+./gradlew inspect -PclassName=UpperCaseTransformer  -Pflags="-p"
+./gradlew inspect -PclassName=TypeErasureDemo -Pflags="-c"
+
+# 사용 가능한 클래스 목록 확인
+./gradlew inspect
+
+build/classes/ 에 컴파일 결과가 저장되며, .gitignore의 build/에 의해 자동 제외됩니다.
+

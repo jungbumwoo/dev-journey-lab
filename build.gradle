@@ -1,0 +1,117 @@
+plugins {
+    id 'java'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+// 기존 src/ 디렉토리 구조 유지 (src/main/java 대신 src/ 사용)
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// 데모 실행 태스크
+//   ./gradlew runAbstract   - Abstract class 내부 동작
+//   ./gradlew runErasure    - Type Erasure 심층 분석
+//   ./gradlew runBridge     - Bridge Method 분석
+//   ./gradlew runBounded    - Bounded Type & PECS
+//   ./gradlew runAll        - 전체 실행
+// ─────────────────────────────────────────────────────────────────
+
+def demos = [
+    [name: 'Abstract',  mainClass: 'abstractclass.AbstractClassDemo', desc: 'Abstract class 내부 동작 (invokevirtual, ACC_ABSTRACT)'],
+    [name: 'Erasure',   mainClass: 'generics.TypeErasureDemo',        desc: 'Type Erasure 심층 분석 (checkcast, Signature attribute)'],
+    [name: 'Bridge',    mainClass: 'generics.BridgeMethodDemo',       desc: 'Bridge Method 분석 (ACC_BRIDGE, ACC_SYNTHETIC)'],
+    [name: 'Bounded',   mainClass: 'generics.BoundedTypeDemo',        desc: 'Bounded Type Parameters & PECS'],
+    [name: 'Interface', mainClass: 'interfaces.InterfaceDemo',        desc: 'Interface 내부 동작 (ACC_INTERFACE, invokeinterface, invokedynamic)'],
+]
+
+demos.each { demo ->
+    tasks.register("run${demo.name}", JavaExec) {
+        group = 'demo'
+        description = demo.desc
+        classpath = sourceSets.main.runtimeClasspath
+        mainClass = demo.mainClass
+    }
+}
+
+// 전체 실행 (순서 보장)
+tasks.register('runAll') {
+    group = 'demo'
+    description = '모든 데모 순서대로 실행'
+    dependsOn demos.collect { "run${it.name}" }
+}
+
+// 순서 지정 (mustRunAfter로 직렬 실행 보장)
+tasks.named('runErasure')   { mustRunAfter('runAbstract') }
+tasks.named('runBridge')    { mustRunAfter('runErasure') }
+tasks.named('runBounded')   { mustRunAfter('runBridge') }
+tasks.named('runInterface') { mustRunAfter('runBounded') }
+
+// ─────────────────────────────────────────────────────────────────
+// 바이트코드 검사 태스크
+//   ./gradlew inspect -PclassName=Shape
+//   ./gradlew inspect -PclassName=Shape          -Pflags="-verbose"
+//   ./gradlew inspect -PclassName=UpperCaseTransformer -Pflags="-p"
+// ─────────────────────────────────────────────────────────────────
+
+tasks.register('inspect') {
+    group = 'demo'
+    description = '바이트코드 검사: ./gradlew inspect -PclassName=<ClassName> [-Pflags="-verbose"]'
+    dependsOn compileJava
+
+    doLast {
+        def className = project.findProperty('className') ?: ''
+        def flags     = (project.findProperty('flags') ?: '-c').toString().split(' ')
+        def classesDir = sourceSets.main.output.classesDirs.first()
+
+        if (!className) {
+            println """
+사용법: ./gradlew inspect -PclassName=<ClassName> [-Pflags="<javap flags>"]
+
+플래그:
+  (기본값)         -c         바이트코드 인스트럭션
+  -Pflags="-verbose"          상세 (Signature, constant pool, flags)
+  -Pflags="-p"                private 멤버 포함 (bridge method 확인)
+  -Pflags="-c -p"             바이트코드 + private
+
+예시:
+  ./gradlew inspect -PclassName=Shape                         # ACC_ABSTRACT 확인
+  ./gradlew inspect -PclassName=Circle                        # invokespecial super() 확인
+  ./gradlew inspect -PclassName=Box            -Pflags="-verbose"  # Signature attribute
+  ./gradlew inspect -PclassName=TypeErasureDemo               # checkcast 확인
+  ./gradlew inspect -PclassName=UpperCaseTransformer -Pflags="-p"  # bridge method
+
+사용 가능한 클래스:"""
+            fileTree(classesDir).matching { include '**/*.class' }.sort().each { f ->
+                def name = f.path.replace(classesDir.path + '/', '').replace('/', '.').replace('.class', '')
+                println "  $name"
+            }
+            return
+        }
+
+        // 클래스 파일 검색
+        def classFile = fileTree(classesDir).matching { include "**/${className}.class" }.find()
+        if (!classFile) {
+            throw new GradleException("클래스를 찾을 수 없음: ${className}\n./gradlew inspect 로 목록 확인")
+        }
+
+        def fqClassName = classFile.path
+            .replace(classesDir.path + File.separator, '')
+            .replace(File.separator, '.')
+            .replace('.class', '')
+
+        println "=== javap ${flags.join(' ')} ${fqClassName} ===\n"
+        exec {
+            commandLine(['javap'] + flags.toList() + ['-classpath', classesDir.path, fqClassName])
+        }
+    }
+}
