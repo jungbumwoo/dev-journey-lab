@@ -1,12 +1,13 @@
 # dev-journey-lab 🧪
 
-궁금했던 것을 코드로 작성, 실행, 접하면서 확인한 것들을 기록합니다.
+A space to record my learnings by writing, running, and experimenting with code to satisfy my technical curiosity.
 
 ## Branches
 
-| Branch                                                                                      | Topic                   | Details                                                |
-|:--------------------------------------------------------------------------------------------|:------------------------|:-------------------------------------------------------|
-| [**nio-server**](https://github.com/jungbumwoo/dev-journey-lab/tree/nio-server)             | **Non-Blocking Server** | jenkov.com NIO server 예제 코드 최신화, minor 개선 및 테스트 추가     |
-| [**coroutine**](https://github.com/jungbumwoo/dev-journey-lab/tree/coroutine)               | **Coroutine**           | coroutine programming 방식 확인                            |
-| [**spring/dive**](https://github.com/jungbumwoo/dev-journey-lab/tree/spring/dive)           | **Spring Aop**          | 『토비의 스프링』 기반 AOP, Proxy, FactoryBean 원리 확인 및 예제 코드 최신화 |
-| [**feat/json_parser**](https://github.com/jungbumwoo/dev-journey-lab/tree/feat/json_parser) | **JSON Parser**         | 라이브러리 없이 직접 구현하며 json parser 확인                        |
+| Branch | Topic | Details |
+|:---|:---|:---|
+| [**nio-server**](https://github.com/jungbumwoo/dev-journey-lab/tree/nio-server) | **Non-Blocking Server** | Updated the jenkov.com NIO server example code, applied minor improvements, and added tests. |
+| [**coroutine**](https://github.com/jungbumwoo/dev-journey-lab/tree/coroutine) | **Coroutine** | Exploring coroutine programming paradigms and mechanics. |
+| [**java-internal**](https://github.com/jungbumwoo/dev-journey-lab/tree/java-internal) | **Java Internals** | Bytecode analysis of Abstract Classes and Generics (Type Erasure, Bridge Methods). |
+| [**spring/dive**](https://github.com/jungbumwoo/dev-journey-lab/tree/spring/dive) | **Spring Aop** | Exploring the principles of AOP, Proxy, and FactoryBean based on *"Toby's Spring"*, along with modernized example code. |
+| [**feat/json_parser**](https://github.com/jungbumwoo/dev-journey-lab/tree/feat/json_parser) | **JSON Parser** | Implementing a JSON parser from scratch without external libraries to understand how it works. |
