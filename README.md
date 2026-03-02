@@ -1,24 +1,23 @@
 # dev-journey-lab 🧪
 
-궁금했던 것을 코드로 작성, 실행, 접하면서 확인한 것들을 기록합니다.
+A space to record my learnings by writing, running, and experimenting with code to satisfy my technical curiosity.
 
 ## Branches
 
-| Branch                                                                                                  | Topic                   | Details                                                |
-|:--------------------------------------------------------------------------------------------------------|:------------------------|:-------------------------------------------------------|
-| [**nio-server**](https://github.com/jungbumwoo/dev-journey-lab/tree/nio-server)                         | **Non-Blocking Server** | jenkov.com NIO server 예제 코드 최신화, minor 개선 및 테스트 추가     |
-| [**coroutine**](https://github.com/jungbumwoo/dev-journey-lab/tree/coroutine)                           | **Coroutine**           | coroutine programming 방식 확인                            |
-| [**java-internal**](https://github.com/jungbumwoo/dev-journey-lab/tree/java-internal)                  | **Java Internals**      | Abstract Class, Generics(Type Erasure, Bridge Method) 바이트코드 분석 |
-| [**spring/dive**](https://github.com/jungbumwoo/dev-journey-lab/tree/spring/dive)                       | **Spring Aop**          | 『토비의 스프링』 기반 AOP, Proxy, FactoryBean 원리 확인 및 예제 코드 최신화 |
-| [**feat/json_parser**](https://github.com/jungbumwoo/dev-journey-lab/tree/feat/json_parser)             | **JSON Parser**         | 라이브러리 없이 직접 구현하며 json parser 확인                        |
+| Branch | Topic | Details |
+|:---|:---|:---|
+| [**nio-server**](https://github.com/jungbumwoo/dev-journey-lab/tree/nio-server) | **Non-Blocking Server** | Updated the jenkov.com NIO server example code, applied minor improvements, and added tests. |
+| [**coroutine**](https://github.com/jungbumwoo/dev-journey-lab/tree/coroutine) | **Coroutine** | Exploring coroutine programming paradigms and mechanics. |
+| [**java-internal**](https://github.com/jungbumwoo/dev-journey-lab/tree/java-internal) | **Java Internals** | Bytecode analysis of Abstract Classes and Generics (Type Erasure, Bridge Methods). |
+| [**spring/dive**](https://github.com/jungbumwoo/dev-journey-lab/tree/spring/dive) | **Spring Aop** | Exploring the principles of AOP, Proxy, and FactoryBean based on *"Toby's Spring"*, along with modernized example code. |
+| [**feat/json_parser**](https://github.com/jungbumwoo/dev-journey-lab/tree/feat/json_parser) | **JSON Parser** | Implementing a JSON parser from scratch without external libraries to understand how it works. |
 
----
 
 # Java Internals (`java-internal` branch)
 
-Abstract class와 Generics의 내부 동작을 바이트코드 수준에서 이해하는 예제 프로젝트.
+Bytecode analysis of Abstract Classes and Generics (Type Erasure, Bridge Methods).
 
-## 프로젝트 구조
+## Project Structure
 
 ```
 src/
@@ -38,7 +37,7 @@ scripts/
 └── inspect.sh   # javap로 바이트코드 확인
 ```
 
-## 빠른 시작
+## Run
 
 ```bash
 # 1. 컴파일
@@ -53,9 +52,9 @@ scripts/
 
 ---
 
-## 학습 내용
+## Learnings
 
-### 1. Abstract Class 내부
+### 1. Abstract Class Internals
 
 | 개념 | 바이트코드 |
 |------|------------|
@@ -164,7 +163,7 @@ void fill(List<? super Integer> list)    // List<Integer>, List<Number>, List<Ob
 
 ---
 
-## JVM 인스트럭션 요약
+## JVM Instructions Summary
 
 | 인스트럭션 | 의미 |
 |------------|------|
@@ -176,28 +175,26 @@ void fill(List<? super Integer> list)    // List<Integer>, List<Number>, List<Ob
 | `instanceof` | 타입 검사 |
 
 ---
-
-# 컴파일
+### Compile
 ./gradlew compileJava
 
-# 개별 데모 실행
-./gradlew runAbstract                                                                                                                                                                                                                                                                                                  
+### Run Individual Demos
+./gradlew runAbstract
 ./gradlew runErasure
 ./gradlew runBridge
 ./gradlew runBounded
 
-# 전체 실행 (순서대로)
+### Run All (in sequence)
 ./gradlew runAll
 
-# 바이트코드 검사
+### Inspect Bytecode
 ./gradlew inspect -PclassName=Shape
 ./gradlew inspect -PclassName=Shape           -Pflags="-verbose"
 ./gradlew inspect -PclassName=Box             -Pflags="-verbose"
 ./gradlew inspect -PclassName=UpperCaseTransformer  -Pflags="-p"
 ./gradlew inspect -PclassName=TypeErasureDemo -Pflags="-c"
 
-# 사용 가능한 클래스 목록 확인
+### Check Available Classes
 ./gradlew inspect
 
 build/classes/ 에 컴파일 결과가 저장되며, .gitignore의 build/에 의해 자동 제외됩니다.
-
