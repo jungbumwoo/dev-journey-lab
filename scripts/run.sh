@@ -8,19 +8,19 @@ DEMO=${1:-help}
 case "$DEMO" in
     abstract)
         echo ">>> AbstractClassDemo"
-        java -cp "$OUT" abstractclass.AbstractClassDemo
+        java -Xlog:vtables*=trace -Xlog:itables*=trace -Xlog:vtablestubs*=trace -Xshare:off -cp "$OUT" abstractclass.AbstractClassDemo
         ;;
     erasure)
         echo ">>> TypeErasureDemo"
-        java -cp "$OUT" generics.TypeErasureDemo
+        java -Xlog:vtables*=trace -Xlog:itables*=trace -Xlog:vtablestubs*=trace -Xshare:off -cp "$OUT" generics.TypeErasureDemo
         ;;
     bridge)
         echo ">>> BridgeMethodDemo"
-        java -cp "$OUT" generics.BridgeMethodDemo
+        java -Xlog:vtables*=trace -Xlog:itables*=trace -Xlog:vtablestubs*=trace -Xshare:off -cp "$OUT" generics.BridgeMethodDemo
         ;;
     bounded)
         echo ">>> BoundedTypeDemo"
-        java -cp "$OUT" generics.BoundedTypeDemo
+        java -Xlog:vtables*=trace -Xlog:itables*=trace -Xlog:vtablestubs*=trace -Xshare:off -cp "$OUT" generics.BoundedTypeDemo
         ;;
     all)
         SCRIPT="$ROOT/scripts/run.sh"

@@ -40,6 +40,15 @@ demos.each { demo ->
         description = demo.desc
         classpath = sourceSets.main.runtimeClasspath
         mainClass = demo.mainClass
+
+        // vtable, itable 관련 로그 활성화 (Java 9+ Unified Logging)
+        // -Xshare:off 를 추가하여 CDS에 의한 캐싱을 끄면 더 많은 초기화 로그를 볼 수 있습니다.
+        jvmArgs = [
+            '-Xlog:vtables*=trace',
+            '-Xlog:itables*=trace',
+            '-Xlog:vtablestubs*=trace',
+            '-Xshare:off'
+        ]
     }
 }
 
