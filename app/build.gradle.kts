@@ -18,6 +18,7 @@ repositories {
 }
 
 dependencies {
+    implementation("cglib:cglib:3.3.0")
     implementation("org.springframework.boot:spring-boot-starter") // manage dependency
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
