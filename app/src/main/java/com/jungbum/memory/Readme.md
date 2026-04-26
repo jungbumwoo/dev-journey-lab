@@ -1,6 +1,8 @@
 # JVM Memory Structure Lab
 
 이 프로젝트는 Java Virtual Machine(JVM)의 핵심 메모리 구조와 각 영역의 동작 원리를 코드로 직접 실행해 보며 탐구하기 위한 실습 저장소입니다.
+https://github.com/WegraLee/JVM 을 참고하였습니다.
+
 
 ## 프로젝트 구조
 
@@ -46,6 +48,6 @@ com.jungbum.memory/
     - 가장 먼저 `overview/JVMMemoryOverview.java`를 실행해 보세요. JVM 전체 구조와 현재 메모리 사용량을 한눈에 파악할 수 있는 훌륭한 출발점입니다.
 
 2. **VM 옵션(매개변수) 설정 필수**
-    - 각 실습 파일이 의도한 대로 동작하기 위해서는(예: OutOfMemoryError 유발 등) 특정한 JVM 설정이 필요합니다.
+    - 각 실습 파일이 의도한 대로 동작하기 위해서는(예: OutOfMemoryError 유발 등) 특정한 JVM 설정이 필요
     - 각 파일 상단의 `Javadoc` 주석에 **실행 방법**과 **필수 VM 매개변수(VM Options)**가 명시되어 있으니, IDE에서 실행 구성을 세팅할 때 반드시 참고해 주세요.
                                                                                   
