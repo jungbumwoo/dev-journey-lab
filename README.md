@@ -16,6 +16,18 @@
 - **FactoryBean**: 스프링 빈 생성 로직이 복잡할 때 사용하는 커스텀 팩토리 인터페이스.
 - **Transaction Abstraction**: `PlatformTransactionManager`를 통한 트랜잭션 관리.
 - **AOP (Aspect Oriented Programming)**: 부가기능과 핵심 로직의 분리.
+- **BeanPostProcessor**: 스프링 컨테이너가 빈 초기화 전후에 호출하는 확장 포인트. 빈 객체의 상태를 조작하거나 프록시 같은 다른 객체로 바꿔치기할 수 있음.
+
+### BeanPostProcessor 데모 실행
+
+[`BeanPostProcessorDemo`](app/src/main/java/com/jungbum/beanPostProcessor/BeanPostProcessorDemo.java)는 다음 흐름을 보여준다.
+
+- `postProcessBeforeInitialization`: `DefaultGreetingService`의 `prefix` 필드를 바꿔 빈 객체의 상태를 조작함.
+- `postProcessAfterInitialization`: `DefaultPaymentService`를 JDK 동적 프록시 객체로 바꿔치기해 메서드 호출 전후 부가기능을 실행함.
+
+```console
+foo@bar:~$ ./gradlew :app:beanPostProcessorDemo
+```
 
 ### Test 실행
 ```console

@@ -73,3 +73,10 @@ tasks.withType<Test> {
         }
     })
 }
+
+tasks.register<JavaExec>("beanPostProcessorDemo") {
+    group = "application"
+    description = "BeanPostProcessor 학습용 데모를 실행합니다."
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("com.jungbum.beanPostProcessor.BeanPostProcessorDemo")
+}
