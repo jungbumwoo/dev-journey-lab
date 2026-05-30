@@ -32,6 +32,7 @@ def demos = [
     [name: 'Bridge',    mainClass: 'generics.BridgeMethodDemo',       desc: 'Bridge Method 분석 (ACC_BRIDGE, ACC_SYNTHETIC)'],
     [name: 'Bounded',   mainClass: 'generics.BoundedTypeDemo',        desc: 'Bounded Type Parameters & PECS'],
     [name: 'Interface', mainClass: 'interfaces.InterfaceDemo',        desc: 'Interface 내부 동작 (ACC_INTERFACE, invokeinterface, invokedynamic)'],
+    [name: 'Nested',    mainClass: 'nested.NestedClassDemo',          desc: 'Nested class (Inner vs Static Nested, this$0, GC 동작)'],
 ]
 
 demos.each { demo ->
@@ -64,6 +65,7 @@ tasks.named('runErasure')   { mustRunAfter('runAbstract') }
 tasks.named('runBridge')    { mustRunAfter('runErasure') }
 tasks.named('runBounded')   { mustRunAfter('runBridge') }
 tasks.named('runInterface') { mustRunAfter('runBounded') }
+tasks.named('runNested')    { mustRunAfter('runInterface') }
 
 // ─────────────────────────────────────────────────────────────────
 // 바이트코드 검사 태스크
