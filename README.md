@@ -16,7 +16,20 @@
 - **FactoryBean**: 스프링 빈 생성 로직이 복잡할 때 사용하는 커스텀 팩토리 인터페이스.
 - **Transaction Abstraction**: `PlatformTransactionManager`를 통한 트랜잭션 관리.
 - **AOP (Aspect Oriented Programming)**: 부가기능과 핵심 로직의 분리.
+- **BeanDefinition**: 스프링 컨테이너가 빈을 생성하기 전에 사용하는 빈 메타데이터/설계도.
 - **BeanPostProcessor**: 스프링 컨테이너가 빈 초기화 전후에 호출하는 확장 포인트. 빈 객체의 상태를 조작하거나 프록시 같은 다른 객체로 바꿔치기할 수 있음.
+
+### BeanDefinition 데모 실행
+
+[`BeanDefinitionDemo`](app/src/main/java/com/jungbum/bean/BeanDefinitionDemo.java)는 다음 흐름을 보여준다.
+
+- `BeanDefinitionBuilder`로 빈의 클래스, property, scope, lazy-init 정보를 직접 등록함.
+- `refresh()` 전에는 설계도만 있고, `refresh()` 이후 컨테이너가 설계도를 바탕으로 빈을 생성함.
+- `singleton`과 `prototype` 스코프의 객체 생성 차이를 비교함.
+
+```console
+foo@bar:~$ ./gradlew :app:beanDefinitionDemo
+```
 
 ### BeanPostProcessor 데모 실행
 

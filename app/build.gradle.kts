@@ -74,9 +74,40 @@ tasks.withType<Test> {
     })
 }
 
+// ./gradlew :app:beanPostProcessorDemo
 tasks.register<JavaExec>("beanPostProcessorDemo") {
     group = "application"
     description = "BeanPostProcessor 학습용 데모를 실행합니다."
     classpath = sourceSets["main"].runtimeClasspath
     mainClass.set("com.jungbum.beanPostProcessor.BeanPostProcessorDemo")
+}
+
+// ./gradlew :app:beanFactoryPostProcessorDemo
+tasks.register<JavaExec>("beanFactoryPostProcessorDemo") {
+    group = "application"
+    description = "BeanFactoryPostProcessor 학습용 데모를 실행합니다."
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("com.jungbum.bean.BeanFactoryPostProcessorDemo")
+}
+
+// ./gradlew :app:beanDefinitionDemo
+tasks.register<JavaExec>("beanDefinitionDemo") {
+    group = "application"
+    description = "BeanDefinition 학습용 데모를 실행합니다."
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("com.jungbum.bean.BeanDefinitionDemo")
+}
+
+tasks.register<JavaExec>("beanLifecycleDemo") {
+    group = "application"
+    description = "스프링 빈 전체 생명주기 학습용 데모를 실행합니다."
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("com.jungbum.bean.BeanLifecycleDemo")
+}
+
+tasks.register<JavaExec>("realisticLifecycleDemo") {
+    group = "application"
+    description = "실무에 가까운 빈 생명주기(생성자 주입 + @PostConstruct/@PreDestroy) 데모를 실행합니다."
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("com.jungbum.bean.RealisticLifecycleDemo")
 }
