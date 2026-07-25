@@ -79,7 +79,7 @@ tasks.register<JavaExec>("beanPostProcessorDemo") {
     group = "application"
     description = "BeanPostProcessor 학습용 데모를 실행합니다."
     classpath = sourceSets["main"].runtimeClasspath
-    mainClass.set("com.jungbum.beanPostProcessor.BeanPostProcessorDemo")
+    mainClass.set("com.jungbum.bean.BeanPostProcessorDemo")
 }
 
 // ./gradlew :app:beanFactoryPostProcessorDemo
@@ -88,6 +88,14 @@ tasks.register<JavaExec>("beanFactoryPostProcessorDemo") {
     description = "BeanFactoryPostProcessor 학습용 데모를 실행합니다."
     classpath = sourceSets["main"].runtimeClasspath
     mainClass.set("com.jungbum.bean.BeanFactoryPostProcessorDemo")
+}
+
+// ./gradlew :app:beanFactoryPostProcessorOrderDemo
+tasks.register<JavaExec>("beanFactoryPostProcessorOrderDemo") {
+    group = "application"
+    description = "BeanFactoryPostProcessor 실행 순서 학습용 데모를 실행합니다."
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("com.jungbum.bean.BeanFactoryPostProcessorOrderDemo")
 }
 
 // ./gradlew :app:beanDefinitionDemo

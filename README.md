@@ -33,13 +33,25 @@ foo@bar:~$ ./gradlew :app:beanDefinitionDemo
 
 ### BeanPostProcessor 데모 실행
 
-[`BeanPostProcessorDemo`](app/src/main/java/com/jungbum/beanPostProcessor/BeanPostProcessorDemo.java)는 다음 흐름을 보여준다.
+[`BeanPostProcessorDemo`](app/src/main/java/com/jungbum/bean/BeanPostProcessorDemo.java)는 다음 흐름을 보여준다.
 
 - `postProcessBeforeInitialization`: `DefaultGreetingService`의 `prefix` 필드를 바꿔 빈 객체의 상태를 조작함.
 - `postProcessAfterInitialization`: `DefaultPaymentService`를 JDK 동적 프록시 객체로 바꿔치기해 메서드 호출 전후 부가기능을 실행함.
 
 ```console
 foo@bar:~$ ./gradlew :app:beanPostProcessorDemo
+```
+
+### BeanFactoryPostProcessor 실행 순서 데모
+
+[`BeanFactoryPostProcessorOrderDemo`](app/src/main/java/com/jungbum/bean/BeanFactoryPostProcessorOrderDemo.java)는 다음 흐름을 보여준다.
+
+- `BeanDefinitionRegistryPostProcessor`가 일반 `BeanFactoryPostProcessor`보다 먼저 실행됨.
+- 각 그룹 안에서 `PriorityOrdered` → `Ordered` → order 없는 구현체 순서로 실행됨.
+- `ConfigurationClassPostProcessor`가 `@Configuration`, `@ComponentScan`, `@Bean`, `@Import`를 해석해 새로운 `BeanDefinition`을 등록함.
+
+```console
+foo@bar:~$ ./gradlew :app:beanFactoryPostProcessorOrderDemo
 ```
 
 ### Test 실행
