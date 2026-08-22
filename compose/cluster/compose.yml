@@ -1,0 +1,95 @@
+name: ${CLUSTER_PROJECT:-redis-cluster-lab}
+
+x-cluster-node: &cluster-node
+  image: ${REDIS_IMAGE:-redis:8.8.1-trixie}
+  restart: "no"
+  networks: [redis-cluster]
+  healthcheck:
+    test: ["CMD", "redis-cli", "PING"]
+    interval: 2s
+    timeout: 1s
+    retries: 30
+
+services:
+  redis-cluster-1:
+    <<: *cluster-node
+    hostname: redis-cluster-1
+    command: ["redis-server", "/etc/redis/redis-cluster.conf", "--cluster-announce-hostname", "redis-cluster-1", "--cluster-announce-human-nodename", "redis-cluster-1"]
+    volumes:
+      - redis-cluster-1-data:/data
+      - ./conf/redis-cluster.conf:/etc/redis/redis-cluster.conf:ro
+
+  redis-cluster-2:
+    <<: *cluster-node
+    hostname: redis-cluster-2
+    command: ["redis-server", "/etc/redis/redis-cluster.conf", "--cluster-announce-hostname", "redis-cluster-2", "--cluster-announce-human-nodename", "redis-cluster-2"]
+    volumes:
+      - redis-cluster-2-data:/data
+      - ./conf/redis-cluster.conf:/etc/redis/redis-cluster.conf:ro
+
+  redis-cluster-3:
+    <<: *cluster-node
+    hostname: redis-cluster-3
+    command: ["redis-server", "/etc/redis/redis-cluster.conf", "--cluster-announce-hostname", "redis-cluster-3", "--cluster-announce-human-nodename", "redis-cluster-3"]
+    volumes:
+      - redis-cluster-3-data:/data
+      - ./conf/redis-cluster.conf:/etc/redis/redis-cluster.conf:ro
+
+  redis-cluster-4:
+    <<: *cluster-node
+    hostname: redis-cluster-4
+    command: ["redis-server", "/etc/redis/redis-cluster.conf", "--cluster-announce-hostname", "redis-cluster-4", "--cluster-announce-human-nodename", "redis-cluster-4"]
+    volumes:
+      - redis-cluster-4-data:/data
+      - ./conf/redis-cluster.conf:/etc/redis/redis-cluster.conf:ro
+
+  redis-cluster-5:
+    <<: *cluster-node
+    hostname: redis-cluster-5
+    command: ["redis-server", "/etc/redis/redis-cluster.conf", "--cluster-announce-hostname", "redis-cluster-5", "--cluster-announce-human-nodename", "redis-cluster-5"]
+    volumes:
+      - redis-cluster-5-data:/data
+      - ./conf/redis-cluster.conf:/etc/redis/redis-cluster.conf:ro
+
+  redis-cluster-6:
+    <<: *cluster-node
+    hostname: redis-cluster-6
+    command: ["redis-server", "/etc/redis/redis-cluster.conf", "--cluster-announce-hostname", "redis-cluster-6", "--cluster-announce-human-nodename", "redis-cluster-6"]
+    volumes:
+      - redis-cluster-6-data:/data
+      - ./conf/redis-cluster.conf:/etc/redis/redis-cluster.conf:ro
+
+  toolbox:
+    image: ${REDIS_IMAGE:-redis:8.8.1-trixie}
+    restart: "no"
+    networks: [redis-cluster]
+    command: ["sh", "-c", "while :; do sleep 3600; done"]
+    depends_on:
+      redis-cluster-1: {condition: service_healthy}
+      redis-cluster-2: {condition: service_healthy}
+      redis-cluster-3: {condition: service_healthy}
+      redis-cluster-4: {condition: service_healthy}
+      redis-cluster-5: {condition: service_healthy}
+      redis-cluster-6: {condition: service_healthy}
+
+  client-lab:
+    image: ${CLIENT_IMAGE:-redis-operations-client:local}
+    build:
+      context: ../..
+      dockerfile: client-lab/Dockerfile
+    profiles: [client]
+    networks: [redis-cluster]
+    environment:
+      REDIS_CLUSTER_NODES: redis-cluster-1:6379,redis-cluster-2:6379,redis-cluster-3:6379
+
+networks:
+  redis-cluster:
+    name: ${CLUSTER_PROJECT:-redis-cluster-lab}-network
+
+volumes:
+  redis-cluster-1-data:
+  redis-cluster-2-data:
+  redis-cluster-3-data:
+  redis-cluster-4-data:
+  redis-cluster-5-data:
+  redis-cluster-6-data:

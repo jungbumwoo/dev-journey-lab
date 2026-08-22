@@ -1,0 +1,10 @@
+.git
+.gradle
+.idea
+app
+bin
+build
+out
+artifacts
+*.swp
+**/build

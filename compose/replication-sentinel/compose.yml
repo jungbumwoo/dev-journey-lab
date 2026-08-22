@@ -1,0 +1,150 @@
+name: ${SENTINEL_PROJECT:-redis-sentinel-lab}
+
+x-redis-common: &redis-common
+  image: ${REDIS_IMAGE:-redis:8.8.1-trixie}
+  restart: "no"
+  networks: [redis-sentinel]
+  healthcheck:
+    test: ["CMD", "redis-cli", "PING"]
+    interval: 2s
+    timeout: 1s
+    retries: 30
+
+x-sentinel-common: &sentinel-common
+  image: ${REDIS_IMAGE:-redis:8.8.1-trixie}
+  restart: "no"
+  networks: [redis-sentinel]
+  depends_on:
+    redis-primary:
+      condition: service_healthy
+    redis-replica-1:
+      condition: service_healthy
+    redis-replica-2:
+      condition: service_healthy
+  volumes:
+    - ./conf/sentinel.template.conf:/readonly/sentinel.conf:ro
+  command:
+    - sh
+    - -ec
+    - |
+      if [ ! -f /data/sentinel.conf ]; then
+        cp /readonly/sentinel.conf /data/sentinel.conf
+      fi
+      exec redis-server /data/sentinel.conf --sentinel
+  healthcheck:
+    test: ["CMD", "redis-cli", "-p", "26379", "PING"]
+    interval: 2s
+    timeout: 1s
+    retries: 30
+
+services:
+  redis-primary:
+    <<: *redis-common
+    hostname: redis-primary
+    # 최초 primary도 장애 전환 후에는 replica가 될 수 있다. 이때 동적 IP가
+    # Sentinel 상태에 저장되지 않도록 모든 Redis 노드가 안정적인 DNS명을 알린다.
+    command:
+      - redis-server
+      - /etc/redis/redis.common.conf
+      - --replica-announce-ip
+      - redis-primary
+      - --replica-announce-port
+      - "6379"
+    volumes:
+      - redis-primary-data:/data
+      - ./conf/redis.common.conf:/etc/redis/redis.common.conf:ro
+
+  redis-replica-1:
+    <<: *redis-common
+    hostname: redis-replica-1
+    command:
+      - redis-server
+      - /etc/redis/replica.conf
+      - --replica-announce-ip
+      - redis-replica-1
+      - --replica-announce-port
+      - "6379"
+    depends_on:
+      redis-primary:
+        condition: service_healthy
+    volumes:
+      - redis-replica-1-data:/data
+      - ./conf/redis.common.conf:/etc/redis/redis.common.conf:ro
+      - ./conf/replica.conf:/etc/redis/replica.conf:ro
+
+  redis-replica-2:
+    <<: *redis-common
+    hostname: redis-replica-2
+    command:
+      - redis-server
+      - /etc/redis/replica.conf
+      - --replica-announce-ip
+      - redis-replica-2
+      - --replica-announce-port
+      - "6379"
+    depends_on:
+      redis-primary:
+        condition: service_healthy
+    volumes:
+      - redis-replica-2-data:/data
+      - ./conf/redis.common.conf:/etc/redis/redis.common.conf:ro
+      - ./conf/replica.conf:/etc/redis/replica.conf:ro
+
+  sentinel-1:
+    <<: *sentinel-common
+    hostname: sentinel-1
+    volumes:
+      - sentinel-1-data:/data
+      - ./conf/sentinel.template.conf:/readonly/sentinel.conf:ro
+
+  sentinel-2:
+    <<: *sentinel-common
+    hostname: sentinel-2
+    volumes:
+      - sentinel-2-data:/data
+      - ./conf/sentinel.template.conf:/readonly/sentinel.conf:ro
+
+  sentinel-3:
+    <<: *sentinel-common
+    hostname: sentinel-3
+    volumes:
+      - sentinel-3-data:/data
+      - ./conf/sentinel.template.conf:/readonly/sentinel.conf:ro
+
+  toolbox:
+    image: ${REDIS_IMAGE:-redis:8.8.1-trixie}
+    restart: "no"
+    networks: [redis-sentinel]
+    command: ["sh", "-c", "while :; do sleep 3600; done"]
+    depends_on:
+      sentinel-1:
+        condition: service_healthy
+      sentinel-2:
+        condition: service_healthy
+      sentinel-3:
+        condition: service_healthy
+
+  client-lab:
+    image: ${CLIENT_IMAGE:-redis-operations-client:local}
+    build:
+      context: ../..
+      dockerfile: client-lab/Dockerfile
+    profiles: [client]
+    networks: [redis-sentinel]
+    environment:
+      SENTINEL_NODES: sentinel-1:26379,sentinel-2:26379,sentinel-3:26379
+      SENTINEL_MASTER_NAME: redis-main
+      REDIS_PRIMARY_URI: redis://redis-primary:6379
+      REDIS_REPLICA_URIS: redis://redis-replica-1:6379,redis://redis-replica-2:6379
+
+networks:
+  redis-sentinel:
+    name: ${SENTINEL_PROJECT:-redis-sentinel-lab}-network
+
+volumes:
+  redis-primary-data:
+  redis-replica-1-data:
+  redis-replica-2-data:
+  sentinel-1-data:
+  sentinel-2-data:
+  sentinel-3-data:

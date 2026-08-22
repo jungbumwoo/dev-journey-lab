@@ -1,6 +1,9 @@
 .gradle
 build/
 app/
+artifacts/
+.env
+*.swp
 
 # Java class files
 *.class

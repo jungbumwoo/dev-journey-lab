@@ -1,0 +1,11 @@
+[versions]
+lettuce = "7.2.1.RELEASE"
+slf4j = "2.0.17"
+junit = "5.12.2"
+
+[libraries]
+lettuce-core = { module = "io.lettuce:lettuce-core", version.ref = "lettuce" }
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
