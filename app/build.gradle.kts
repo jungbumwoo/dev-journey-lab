@@ -119,3 +119,27 @@ tasks.register<JavaExec>("realisticLifecycleDemo") {
     classpath = sourceSets["main"].runtimeClasspath
     mainClass.set("com.jungbum.bean.RealisticLifecycleDemo")
 }
+
+// ./gradlew :app:proxyMechanismDemo
+tasks.register<JavaExec>("proxyMechanismDemo") {
+    group = "application"
+    description = "JDK Dynamic Proxy, CGLIB, interceptor chain의 구조를 비교합니다."
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("com.jungbum.aop.proxy.ProxyMechanismDemo")
+}
+
+// ./gradlew :app:cglibBytecodeDemo
+tasks.register<JavaExec>("cglibBytecodeDemo") {
+    group = "application"
+    description = "CGLIB이 생성한 바이트코드를 캡처해 class 파일로 저장합니다."
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("com.jungbum.aop.proxy.CglibBytecodeDemo")
+}
+
+// ./gradlew :app:reflectionCostDemo
+tasks.register<JavaExec>("reflectionCostDemo") {
+    group = "application"
+    description = "직접 호출, Method.invoke, MethodHandle의 호출 비용을 관찰합니다."
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("com.jungbum.aop.proxy.ReflectionCostDemo")
+}

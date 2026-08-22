@@ -58,6 +58,87 @@ foo@bar:~$ ./gradlew :app:beanFactoryPostProcessorOrderDemo
 foo@bar:~$ gradle clean test
 ```
 
+### Proxy 내부 구조 데모
+
+[`ProxyMechanismDemo`](app/src/main/java/com/jungbum/aop/proxy/ProxyMechanismDemo.java)는 같은
+`CalculatorService` 호출을 JDK Dynamic Proxy, CGLIB, 축약한 Spring interceptor chain으로 각각 실행한다.
+
+```console
+./gradlew :app:proxyMechanismDemo
+./gradlew :app:test --tests 'com.jungbum.aop.proxy.*'
+```
+
+#### JDK Dynamic Proxy와 InvocationHandler
+
+JDK 프록시는 `java.lang.reflect.Proxy`의 서브클래스이면서 요청한 인터페이스를 구현하는 클래스를
+런타임에 만든다. 생성된 각 인터페이스 메서드는 대략 다음 일을 한다.
+
+1. 호출 인자를 `Object[]`로 만든다.
+2. 프록시가 가진 `InvocationHandler`에 `proxy`, `Method`, 인자를 전달한다.
+3. 이 예제의 [`TracingInvocationHandler`](app/src/main/java/com/jungbum/aop/proxy/TracingInvocationHandler.java)는
+   전후 동작을 수행한 뒤 `Method.invoke(target, args)`로 실제 객체를 호출한다.
+
+따라서 프록시 생성 코드는 메서드마다 필요하지 않고 핸들러 하나에 모인다. 반면 인터페이스가
+필수이고, `equals`, `hashCode`, `toString`도 핸들러에 들어오기 때문에 그 정책을 명시해야 한다.
+`InvocationHandler` 자체가 target을 자동으로 호출하는 것은 아니다. 테스트처럼 값을 바로 반환할 수도
+있으며, 이 예제는 일반적인 위임 프록시를 보여주기 위해 핸들러 안에서 reflection을 선택했다.
+
+#### CGLIB은 바이트코드를 어떻게 조작하는가
+
+`Enhancer`는 target class의 생성자와 오버라이드 가능한 메서드를 조사하고, Spring에 포함된 ASM으로
+새 `.class` 바이트 배열을 만든 뒤 ClassLoader에 정의한다. 생성된 클래스는 개념적으로 다음 모양이다.
+
+```java
+class CalculatorService$$EnhancerByCGLIB extends CalculatorService {
+    MethodInterceptor callback;
+
+    @Override
+    public int add(int left, int right) {
+        return (int) callback.intercept(this, ADD_METHOD, new Object[] {left, right}, ADD_METHOD_PROXY);
+    }
+
+    final int CGLIB$add$0(int left, int right) {
+        return super.add(left, right); // MethodProxy.invokeSuper가 도달하는 경로
+    }
+}
+```
+
+실제 이름과 세부 구현은 버전에 따라 달라지지만 핵심은 "서브클래스 + override + callback"이다.
+그래서 `final` 클래스는 프록시를 만들 수 없고 `final`/`private` 메서드는 가로챌 수 없다.
+[`CglibBytecodeDemo`](app/src/main/java/com/jungbum/aop/proxy/CglibBytecodeDemo.java)는 CGLIB의
+generation strategy에서 실제 바이트 배열을 캡처한다.
+
+```console
+./gradlew :app:cglibBytecodeDemo
+# 데모가 마지막에 출력한 inspect command를 그대로 실행한다.
+```
+
+raw CGLIB 예제의 `MethodProxy.invokeSuper(proxy, args)`는 같은 프록시 인스턴스의 부모 구현으로 간다.
+반면 Spring의 `CglibAopProxy.DynamicAdvisedInterceptor`는 프록시와 별도로 target을 얻고 advisor chain을
+구한다. chain이 있으면 `ReflectiveMethodInvocation.proceed()`가 interceptor를 하나씩 실행하고,
+마지막 joinpoint에서 reflection으로 target을 호출한다. 즉 CGLIB은 Spring AOP에서 "호출을 낚아채는
+입구"이고, 그 뒤의 advice chain 및 target 호출 방식과는 별개다.
+
+#### Reflection API는 왜 느릴 수 있는가
+
+직접 호출은 수신 타입과 인자/반환 타입이 bytecode에 구체적으로 들어 있어 JIT가 인라이닝과
+특수화를 하기 쉽다. `Method.invoke(Object, Object...)` 경계에는 다음 비용이 추가될 수 있다.
+
+- 가변 인자 `Object[]` 구성과 primitive boxing/unboxing
+- 접근 권한, 인자 개수, 런타임 타입 호환성 검사
+- target이 던진 예외를 `InvocationTargetException`으로 감싸고 다시 해석하는 경로
+- 동적으로 바뀔 수 있는 `Method` 때문에 직접 호출보다 어려운 인라이닝/최적화
+
+JDK 18 이후 core reflection은 내부적으로 MethodHandle 위에 다시 구현되었으므로, 오래된 설명처럼
+항상 JNI/native 호출을 거친다고 이해하면 안 된다. 고정된 `Method`와 충분한 워밍업에서는 JVM이
+상당 부분 최적화할 수 있고, 실제 차이는 호출 모양과 JVM 버전에 따라 달라진다.
+[`ReflectionCostDemo`](app/src/main/java/com/jungbum/aop/proxy/ReflectionCostDemo.java)는 워밍업과 결과
+소비를 포함한 관찰용 코드다. 숫자를 신뢰해야 하는 성능 판단에는 JMH를 사용해야 한다.
+
+```console
+./gradlew :app:reflectionCostDemo
+```
+
 # dev-journey-lab 🧪
 
 A space to record my learnings by writing, running, and experimenting with code to satisfy my technical curiosity.
@@ -71,4 +152,3 @@ A space to record my learnings by writing, running, and experimenting with code 
 | [**java-internal**](https://github.com/jungbumwoo/dev-journey-lab/tree/java-internal) | **Java Internals** | Bytecode analysis of Abstract Classes and Generics (Type Erasure, Bridge Methods). |
 | [**spring/dive**](https://github.com/jungbumwoo/dev-journey-lab/tree/spring/dive) | **Spring Aop** | Exploring the principles of AOP, Proxy, and FactoryBean based on *"Toby's Spring"*, along with modernized example code. |
 | [**feat/json_parser**](https://github.com/jungbumwoo/dev-journey-lab/tree/feat/json_parser) | **JSON Parser** | Implementing a JSON parser from scratch without external libraries to understand how it works. |
-
