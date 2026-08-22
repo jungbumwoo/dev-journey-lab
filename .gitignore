@@ -1,7 +1,8 @@
 .gradle
 build/
 app/
-
+# redis branch 에서 artifacts folder가 추가 됨
+artifacts/
 # Java class files
 *.class
 
