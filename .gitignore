@@ -5,6 +5,9 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+# redis branch 에서 artifacts folder가 추가 됨
+artifacts/
+
 ### STS ###
 .apt_generated
 .classpath
